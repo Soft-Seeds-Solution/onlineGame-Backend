@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/upload-game", upload.single("thumbnail"), errorHandling(async (req, res) => {
     const { title, categoryId, shortDes, description, gameUrl, howToPlay, whoCreated, keywords, orientation } = req.body
-    if (!title || !categoryId || !shortDes || !gameUrl || !howToPlay || !orientation) return res.status(400).json({ message: "Fields with * should be filled" })
+    if (!title || !categoryId || !shortDes || !gameUrl || !howToPlay || !orientation || !keywords) return res.status(400).json({ message: "Fields with * should be filled" })
 
     const existingTitle = await Products.findOne({
         title: { $regex: new RegExp("^" + title + "$", "i") },
@@ -62,7 +62,7 @@ router.delete("/delGame/:id", errorHandling(async (req, res) => {
 }));
 
 router.put("/editGame/:id", upload.single("thumbnail"), errorHandling(async (req, res) => {
-    const { title, categoryId, shortDes, description, gameUrl, howToPlay, whoCreated } = req.body;
+    const { title, categoryId, shortDes, description, gameUrl, howToPlay, whoCreated, keywords, orientation } = req.body;
 
     let newGameData = {}
     if (title) newGameData.title = title
@@ -72,6 +72,8 @@ router.put("/editGame/:id", upload.single("thumbnail"), errorHandling(async (req
     if (gameUrl) newGameData.gameUrl = gameUrl
     if (howToPlay) newGameData.howToPlay = howToPlay
     if (whoCreated) newGameData.whoCreated = whoCreated
+    if (orientation) newGameData.orientation = orientation
+    if (keywords) newGameData.keywords = keywords.split(",").map((keyword) => keyword.trim())
     if (req.file) {
         const uploadTHumbnail = await Cloudinary.uploader.upload(req.file.path)
         newGameData.thumbnail = uploadTHumbnail.secure_url
