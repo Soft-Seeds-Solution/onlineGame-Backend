@@ -12,7 +12,9 @@ const productSchema = new Schema({
     gameUrl: String,
     description: String,
     howToPlay: String,
-    whoCreated: String
+    whoCreated: String,
+    keywords: [String],
+    orientation: String,
 }, { timestamps: true });
 
 export default mongoose.model("Games", productSchema);

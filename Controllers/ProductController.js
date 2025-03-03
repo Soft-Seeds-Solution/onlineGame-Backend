@@ -7,8 +7,8 @@ import Cloudinary from "../Cloudinary.js";
 const router = express.Router();
 
 router.post("/upload-game", upload.single("thumbnail"), errorHandling(async (req, res) => {
-    const { title, categoryId, shortDes, description, gameUrl, howToPlay, whoCreated } = req.body
-    if (!title || !categoryId || !shortDes || !gameUrl || !howToPlay) return res.status(400).json({ message: "Fields with * should be filled" })
+    const { title, categoryId, shortDes, description, gameUrl, howToPlay, whoCreated, keywords, orientation } = req.body
+    if (!title || !categoryId || !shortDes || !gameUrl || !howToPlay || !orientation) return res.status(400).json({ message: "Fields with * should be filled" })
 
     const existingTitle = await Products.findOne({
         title: { $regex: new RegExp("^" + title + "$", "i") },
@@ -22,8 +22,10 @@ router.post("/upload-game", upload.single("thumbnail"), errorHandling(async (req
         thumbnail_url = uploadTHumbnail.secure_url
     }
 
+    const keywordsArr = keywords.split(",").map((keyword) => keyword.trim())
+
     const uploadGame = await Products.create({
-        title, categoryId, shortDes, description, thumbnail: thumbnail_url, gameUrl, howToPlay, whoCreated
+        title, categoryId, shortDes, description, thumbnail: thumbnail_url, gameUrl, howToPlay, whoCreated, keywords: keywordsArr, orientation
     })
 
     res.json(uploadGame)
